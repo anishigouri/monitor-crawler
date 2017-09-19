@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 import moment from 'moment';
 
+import RequisicaoModal from './RequisicaoModal';
+import RequisicaoStore from '../../stores/RequisicaoStore';
+import RequisicaoActions from '../../actions/RequisicaoActions';
+import { showAlert } from '../../util/message';
+
 const socket = io('http://localhost:3000/');
 
 
@@ -10,22 +15,48 @@ class Monitor extends Component {
     constructor(props) {
 			super(props);
 			this.state = {
-				requisicoes: []
+				requisicoes: [],
+				showModal: false
 			}
-    }
+		}
+		
+		componentWillMount() {
+			this.onChange = this.onChange.bind(this);
+		}
 
     componentDidMount() {
+
+			RequisicaoStore.listen(this.onChange);
+
 			socket.on('requisicoes', data => {
-				console.log('data', data);
 				this.setState({requisicoes: data});
 			});
-    }
+		}
+		
+		componentWillUnmount() {
+			RequisicaoStore.unlisten(this.onChange);
+		}
+
+		onShowModal() {
+			this.setState({showModal: !this.state.showModal});
+		}
+
+		onChange(state) {
+			console.log('state', state);
+		}
 
     render() {
         return (
 					<div className='row'>
 						<div className='header-page-header'>
-							<h4>Monitor de Crawlers</h4>
+							<div className='row'>
+								<div className='col-md-6 col-sm-6 col-xs-6'>
+									<h4>Monitor de Crawlers</h4>
+								</div>
+								<div className='col-md-6 col-sm-6 col-xs-6'>
+									<button className='btn float-right' onClick={this.onShowModal.bind(this)}>Nova Requisição</button>
+								</div>
+							</div>
 							<hr />
 						</div>
 						<div className='col-md-12 col-sm-12 col-xs-12'>
@@ -52,6 +83,7 @@ class Monitor extends Component {
 								</tbody>
 							</table>
 						</div>
+						<RequisicaoModal onShowModal={this.onShowModal.bind(this)} showModal={this.state.showModal} />
 					</div>
         )
     }
