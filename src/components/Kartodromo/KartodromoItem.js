@@ -18,6 +18,7 @@ class KartodromoItem extends Component {
   }
 
   render() {
+    console.log('areeerere', this.props.kartodromo);
     return (
       <tr>
         <td className='align-middle'>

@@ -11,13 +11,16 @@ class BaseForm extends Component {
   }
 
   validateFields() {
-    console.log('validateFileds', this.refs);
+    let isValid = true;
 
     _.forIn(this.refs, (obj, key) => {
       if(obj && obj.props.required && !obj.props.value) {
         this.refs[obj.props.state].isRequired();
+        isValid = false;
       }
     });
+
+    return isValid;
   }
 
 }

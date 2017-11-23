@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 import TextInput from '../shared/TextInput';
 import BaseForm from '../shared/BaseForm';
 import ContatoForm from '../shared/Contato/ContatoForm';
+import EnderecoForm from '../shared/Endereco/EnderecoForm';
+import Image from '../shared/ImageCrop/Image';
+import KartodromoStore from '../../stores/KartodromoStore';
+import KartodromoActions from '../../actions/KartodromoActions';
 
 class KartodromoForm extends BaseForm {
 
@@ -11,6 +15,29 @@ class KartodromoForm extends BaseForm {
     super(props);
     this.state = {
       kartodromo: {}
+    }
+    this.onStoreUpdate = this.onStoreUpdate.bind(this);
+  }
+
+  componentDidMount() {
+    KartodromoStore.listen(this.onStoreUpdate);
+    const id = this.props.match.params.id;
+    if(id != 0) {
+      KartodromoActions.fetchKartodromoById(id);
+    }
+  }
+
+  componentWillUnmount() {
+    KartodromoStore.unlisten(this.onStoreUpdate);
+  }
+
+  onStoreUpdate(data) {
+
+    console.log('aaa', data);
+    
+    if(data.action === 'actionFetchKartodromoById' && data.kartodromo) {
+      this.state.kartodromo = data.kartodromo;
+      this.setState(this.state);
     }
   }
 
@@ -22,9 +49,13 @@ class KartodromoForm extends BaseForm {
 
   onSave(event) {
     event.preventDefault();
-    console.log('this.state', this.state);
 
-    super.validateFields();
+    if(super.validateFields() & this.refs.contato.isValid() & this.refs.endereco.isValid()) {
+      this.state.kartodromo.contato = this.refs.contato.getValue();
+      this.state.kartodromo.endereco = this.refs.endereco.getValue();
+      
+      console.log('Kartodromo', this.state.kartodromo);
+    }
   }
 
   render() {
@@ -37,12 +68,23 @@ class KartodromoForm extends BaseForm {
           <hr />
         </div>
         <div className='row'>
+          <div className="col-md-12 col-sm-12 col-xs-12 text-center">
+            <Image
+              title="Foto"
+              width={500}
+              height={250}
+              maxSize={1024}
+              state="foto"
+              onChangeState={this.onChangeState.bind(this)}
+              ref="foto"
+            />
+          </div>
           <div className='col-md-6 col-sm-12 col-xs-12'>
             <TextInput
-              type="text"
-              label="Nome"
-              state="nome"
-              ref="nome"
+              type='text'
+              label='Nome'
+              state='nome'
+              ref='nome'
               required={ true }
               value={this.state.kartodromo.nome}
               onChangeState={this.onChangeState.bind(this)}
@@ -50,10 +92,10 @@ class KartodromoForm extends BaseForm {
           </div>
           <div className='col-md-6 col-sm-12 col-xs-12'>
             <TextInput
-              type="text"
-              label="Site"
-              state="site"
-              ref="site"
+              type='text'
+              label='Site'
+              state='site'
+              ref='site'
               required={ true }
               value={this.state.kartodromo.site}
               onChangeState={this.onChangeState.bind(this)}
@@ -61,15 +103,17 @@ class KartodromoForm extends BaseForm {
           </div>
         </div>
         
-        <ContatoForm />
+        <ContatoForm ref='contato'/>
+
+        <EnderecoForm ref='endereco'/>
         
         <div>
           <hr />
-          <Link className="btn btn-secondary float-left" to='/kartodromos'>
+          <Link className='btn btn-secondary float-left' to='/kartodromos'>
             Voltar
           </Link>
           <button
-            className="btn btn-success float-right"
+            className='btn btn-success float-right'
             onClick={this.onSave.bind(this)}>
               Salvar
           </button>

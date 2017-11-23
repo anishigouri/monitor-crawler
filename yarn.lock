@@ -3426,6 +3426,12 @@ react-addons-transition-group@^15.6.0:
   dependencies:
     react-transition-group "^1.2.0"
 
+react-avatar-editor@^10.3.0:
+  version "10.3.0"
+  resolved "https://registry.yarnpkg.com/react-avatar-editor/-/react-avatar-editor-10.3.0.tgz#7ee54774a274b3aa733d8651e6138d4904114c7d"
+  dependencies:
+    prop-types "^15.5.8"
+
 react-burger-menu@^2.1.11:
   version "2.1.11"
   resolved "https://registry.yarnpkg.com/react-burger-menu/-/react-burger-menu-2.1.11.tgz#3fad92a2edefb10da8a5e8db675f0fec7bd1e4c8"

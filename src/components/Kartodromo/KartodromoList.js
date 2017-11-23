@@ -2,23 +2,60 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import KartodromoItem from './KartodromoItem';
+import KartodromoStore from '../../stores/KartodromoStore';
+import KartodromoActions from '../../actions/KartodromoActions';
+import ModalConfirm from '../shared/ModalConfirm';
 
 class KartodromoList extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      kartodromos: [
-        {
-          id: 1, nome: 'San Marino', site: 'www.kartsanmarino.com', telefone: '(11)2532-6521'
-        }
-      ]
+      kartodromos: [],
+      kartodromoSelectedDelete: {},
+      showModal: false
+    }
+    this.onStoreUpdate = this.onStoreUpdate.bind(this);
+  }
+
+  componentDidMount() {
+    KartodromoStore.listen(this.onStoreUpdate);
+    KartodromoActions.fetchKartodromos();
+  }
+
+  componentWillUnmount() {
+    KartodromoStore.unlisten(this.onStoreUpdate);
+  }
+
+  onStoreUpdate(data) {
+    
+    if(data.action === 'actionFetchKartodromos' && data.kartodromos) {
+      this.state.kartodromos = data.kartodromos;
+      this.setState(this.state);
+    }
+
+    if(data.action === 'actionDeleteKartodromo') {
+      KartodromoActions.fetchKartodromos();
     }
   }
 
   onShowModalDeleteKartodromo(kartodromo) {
-    //this.setState({ userSelectedDelete: user, showModal: true });
+    this.setState({ kartodromoSelectedDelete: kartodromo, showModal: true });
   }
+
+  onDeleteKartodromo(isOk) {
+
+    if(isOk) {
+      this.setState({ showModal: false }, () => {
+        console.log(this.state.kartodromoSelectedDelete.id)
+        KartodromoActions.deleteKartodromo(this.state.kartodromoSelectedDelete.id);
+      });
+    } else {
+      this.setState({ showModal: false, kartodromoSelectedDelete: {} });
+    }
+  }
+
+  
 
   render() {
     return (
@@ -54,6 +91,12 @@ class KartodromoList extends Component {
               }
           </tbody>
         </table>
+        <ModalConfirm
+          title='Remover registro'
+          textBody='Tem certeza que deseja excluir?'
+          show={this.state.showModal}
+          onClick={this.onDeleteKartodromo.bind(this)}
+        />
       </div>
     )
   }
