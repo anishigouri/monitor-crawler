@@ -7,8 +7,6 @@ import { renderToString } from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import { App } from './components/App';
 import http from 'http';
-import socketIO from 'socket.io';
-import pg from 'pg';
 
 const app = new Express();
 
@@ -45,35 +43,6 @@ app.get('*', (req, res) => {
   }
 
   return res.status(status).render('index', { markup });
-});
-
-let io = socketIO(server);
-
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/caddev';
-
-io.on('connection', (socket) => {
-  console.log('someone connected');
-
-  setInterval(() => {
-
-    const client = new pg.Client({
-      user: 'postgres',
-      host: 'localhost',
-      database: 'caddev',
-      password: 'postgres',
-      port: 5432,
-    });
-
-    client.connect();
-
-    client.query('SELECT * FROM crawler_requisicao order by status', (err, res) => {
-        socket.emit('requisicoes', res.rows);
-        client.end();
-    });
-
-     
-  }, 2000);
-  
 });
 
 // start the server

@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import io from 'socket.io-client';
 import moment from 'moment';
 
 import RequisicaoModal from './RequisicaoModal';
 import RequisicaoStore from '../../stores/RequisicaoStore';
 import RequisicaoActions from '../../actions/RequisicaoActions';
 import { showAlert } from '../../util/message';
-
-const socket = io('http://localhost:3000/');
-
 
 class Monitor extends Component {
 
@@ -73,9 +69,9 @@ class Monitor extends Component {
 								{
 									this.state.requisicoes.map((requisicao, idx) => 
 										<tr key={idx}>
-											<td><img width='30px' src={`/img/status/${requisicao.status}.${requisicao.status === 'E' ? 'svg' : 'png'}`} /></td>
+											<td><img width='30px' src={`/img/status/${requisicao.dsc_status_crawler_requisicao}.${requisicao.dsc_status_crawler_requisicao === 'Processando' ? 'svg' : 'png'}`} /></td>
 											<td>{requisicao.cod_requisicao}</td>
-											<td>{requisicao.numero}</td>
+											<td>{requisicao.num_processo}</td>
 											<td>{moment(requisicao.dat_cadastro).format('DD/MM/YYYY hh:mm:ss')}</td>
 										</tr>
 									)
